@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "7E1BA73C12A771F87BDFA0847DA0D5FF39D065BE",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "7E1BA73C12A771F87BDFA0847DA0D5FF39D065BE" : 9223372036854775807,
+    "D2B3D9384DF4A110ADF48DE8CE7FD5BE8985314C" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "E2725487-E64C-4B9C-97E6-E14D3C2D8AB0",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "7E1BA73C12A771F87BDFA0847DA0D5FF39D065BE" : "DiversidoMobile.git\/",
+    "D2B3D9384DF4A110ADF48DE8CE7FD5BE8985314C" : "..\/.."
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "LucidDreams",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "LucidDreams.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/PROudoxa\/DiversidoMobile.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "7E1BA73C12A771F87BDFA0847DA0D5FF39D065BE"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/PROudoxa\/git-first.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "D2B3D9384DF4A110ADF48DE8CE7FD5BE8985314C"
+    }
+  ]
+}
