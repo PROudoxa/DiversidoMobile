@@ -28,6 +28,9 @@ class DreamCell: UITableViewCell {
                 return imageView
             }
             content.text = dream.description
+            content.textColor = UIColor.blue
+            content.font = UIFont.boldSystemFont(ofSize: 16.0)
+         
             for subview in contentView.subviews {
                 subview.removeFromSuperview()
             }
