@@ -28,7 +28,8 @@ class DreamCell: UITableViewCell {
                 return imageView
             }
             content.text = dream.description
-            content.textColor = UIColor.blue
+            //content.textColor = UIColor.blue
+            content.textColor = UIColor(red: 0/255.0, green: 0/255.0, blue: 153/255.0, alpha: 1.0)
             content.font = UIFont.boldSystemFont(ofSize: 16.0)
          
             for subview in contentView.subviews {
