@@ -40,13 +40,82 @@ class DreamListViewController: UITableViewController {
                 case .favoriteCreature: return "Favorite Creature"
                 case .dreams: return "Dreams"
             }
-        }
-    }
+         }
+   }
 
     // MARK: Properties
 
     private var state = State.viewing
     private var model = Model.initial
+
+
+   let fCreatureDefault: String = "Pink unicorn"
+   
+   var fCreature: Dream.Creature {
+      switch fCreatureDefault {
+      case "dragon" : return Dream.Creature.dragon
+      case "shark" : return Dream.Creature.shark
+      case "crusty" : return Dream.Creature.crusty
+      case "Pink unicorn" : return Dream.Creature.unicorn(.pink)
+      case "white unicorn" : return Dream.Creature.unicorn(.white)
+      case "yellow unicorn" : return Dream.Creature.unicorn(.yellow)
+      default: return Dream.Creature.shark
+      }
+   }
+   
+   var crea: Dream.Creature {
+      switch fCreatureDefault {
+      case "dragon" : return Dream.Creature.dragon
+      case "shark" : return Dream.Creature.shark
+      case "crusty" : return Dream.Creature.crusty
+      case "Pink unicorn" : return Dream.Creature.unicorn(.pink)
+      case "white unicorn" : return Dream.Creature.unicorn(.white)
+      case "yellow unicorn" : return Dream.Creature.unicorn(.yellow)
+      default: return Dream.Creature.shark
+      }
+   }
+   
+   var num: Int {
+      get {
+         if 5<6 {  //archive != nil
+          return 1
+         }
+         return 2
+      }
+   }
+   
+   var eff: Set<Dream.Effect> {
+      get {
+         if 5<6 {       //dreamArray[0].effects.popFirst() archive !=nil
+            return [Dream.Effect.fireBreathing]
+         }
+         return [Dream.Effect.snow]
+      }
+   }
+   
+   var descr: String {
+      get {
+         if 5<6 {       //dreamArray[0].effects.popFirst() archive !=nil
+            return "Dream 1"
+         }
+         return "Dream 111"
+      }
+   }
+   
+ 
+      
+   var modelCopy2: DreamListViewControllerModel {
+    get {
+      if 5<6 {
+         return DreamListViewControllerModel(favoriteCreature: fCreature, dreams: [
+                  Dream(description: descr, creature: crea, effects: eff, numberOfCreatures: num)
+               ])
+      }
+      return Model.initial
+      }
+   }
+
+
 
     /// A stored undo manager instance for the `undoManager` property.
     let _undoManager = UndoManager()
@@ -101,52 +170,31 @@ class DreamListViewController: UITableViewController {
     /// Diffs the model changes and updates the UI based on the new model.
     private func modelDidChange(diff: Model.Diff) {
       //parser
-      //       DreamListViewControllerModel(favoriteCreature: .unicorn(.pink), dreams: [
-      //         Dream(description: "Dream 1", creature: .unicorn(.pink), effects: [.fireBreathing]),
-      //         ])
-      
-//      init(description: String, creature: Creature, effects: Set<Effect>, numberOfCreatures: Int = 1) {
-//         self.description = description
-//         self.creature = creature
-//         self.effects = effects
-//         self.numberOfCreatures = numberOfCreatures
-//      }
-      
-      let fName: String = model.favoriteCreature.name
-      //let fImage: UIImage = model.favoriteCreature.image
-      
-      let fCreature: Dream.Creature = Dream.Creature.unicorn(.pink)
-      var dreamArray: [Dream] = model.dreams
-      //for each dream
-      let descr: String = dreamArray[0].description
-      let crea: Dream.Creature = dreamArray[0].creature
-      
-      //for each effects
-      let eff: Dream.Effect? = dreamArray[0].effects.popFirst()
-      
-      let num: Int = dreamArray[0].numberOfCreatures
+//      let fName: String = model.favoriteCreature.name
+//      //let fImage: UIImage = model.favoriteCreature.image
+//      
+//      let fCreature: Dream.Creature = Dream.Creature.unicorn(.pink)
+//      //var dreamArray: [Dream] = model.dreams
+//      var dreamArray: [Dream] = [
+//         Dream(description: "Dream 1", creature: .unicorn(.pink), effects: [.fireBreathing], numberOfCreatures: 1)//,
+//         //Dream(description: "Dream 2", creature: .unicorn(.yellow), effects: [.laserFocus, .magic], numberOfCreatures: 2),
+//            ]
+//
+//      //for each dream
+//      let descr: String = "Dream 1" //dreamArray[0].description
+//      let crea: Dream.Creature = Dream.Creature.unicorn(.pink) //dreamArray[0].creature
+//      //for each effects
+//      let eff: Set<Dream.Effect> = [Dream.Effect.fireBreathing] //dreamArray[0].effects.popFirst()
+//      
+//      let num: Int = 1 //dreamArray[0].numberOfCreatures
+//      
+//      let modelCopy2 = DreamListViewControllerModel(favoriteCreature: fCreature, dreams: dreamArray)
       
       
-      let modelCopy = DreamListViewControllerModel(favoriteCreature: fCreature, dreams: dreamArray)
-         
-      if modelCopy == model {
+      if modelCopy2 == model {
          print("equal")
       } else {print("Not equal...")}
       
-
-      print("fName: \(fName)\n")
-      //print("fImage: \(fImage)\n")
-      print("fCreature: \(fCreature)\n")
-      print("dreamArray: \(dreamArray)\n")
-      print("descr: \(descr)\n")
-      print("crea: \(crea)\n")
-      print("eff: \(String(describing: eff))\n")
-      print("num: \(num)\n")
-
-      
-      //todo: save the new model as default one
-      //print("MODEL modelDidChange \(Model.initial.favoriteCreature.name)")
-      //print("model name: \(model.favoriteCreature.name). count: \(model.dreams.count)")
         // Check to see if we need to update any rows that present a dream.
         if diff.hasAnyDreamChanges {
          //todo: save new dream array as default one
@@ -346,7 +394,7 @@ class DreamListViewController: UITableViewController {
 
     override func viewDidLoad() {
         stateDidChange()
-
+model = modelCopy2  //replace model with saved one
         tableView.allowsMultipleSelectionDuringEditing = true
 
         tableView.register(CreatureCell.self, forCellReuseIdentifier: CreatureCell.reuseIdentifier)
