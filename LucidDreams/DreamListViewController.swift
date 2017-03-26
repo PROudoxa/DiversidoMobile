@@ -100,8 +100,56 @@ class DreamListViewController: UITableViewController {
 
     /// Diffs the model changes and updates the UI based on the new model.
     private func modelDidChange(diff: Model.Diff) {
+      //parser
+      //       DreamListViewControllerModel(favoriteCreature: .unicorn(.pink), dreams: [
+      //         Dream(description: "Dream 1", creature: .unicorn(.pink), effects: [.fireBreathing]),
+      //         ])
+      
+//      init(description: String, creature: Creature, effects: Set<Effect>, numberOfCreatures: Int = 1) {
+//         self.description = description
+//         self.creature = creature
+//         self.effects = effects
+//         self.numberOfCreatures = numberOfCreatures
+//      }
+      
+      let fName: String = model.favoriteCreature.name
+      //let fImage: UIImage = model.favoriteCreature.image
+      
+      let fCreature: Dream.Creature = Dream.Creature.unicorn(.pink)
+      var dreamArray: [Dream] = model.dreams
+      //for each dream
+      let descr: String = dreamArray[0].description
+      let crea: Dream.Creature = dreamArray[0].creature
+      
+      //for each effects
+      let eff: Dream.Effect? = dreamArray[0].effects.popFirst()
+      
+      let num: Int = dreamArray[0].numberOfCreatures
+      
+      
+      let modelCopy = DreamListViewControllerModel(favoriteCreature: fCreature, dreams: dreamArray)
+         
+      if modelCopy == model {
+         print("equal")
+      } else {print("Not equal...")}
+      
+
+      print("fName: \(fName)\n")
+      //print("fImage: \(fImage)\n")
+      print("fCreature: \(fCreature)\n")
+      print("dreamArray: \(dreamArray)\n")
+      print("descr: \(descr)\n")
+      print("crea: \(crea)\n")
+      print("eff: \(String(describing: eff))\n")
+      print("num: \(num)\n")
+
+      
+      //todo: save the new model as default one
+      //print("MODEL modelDidChange \(Model.initial.favoriteCreature.name)")
+      //print("model name: \(model.favoriteCreature.name). count: \(model.dreams.count)")
         // Check to see if we need to update any rows that present a dream.
         if diff.hasAnyDreamChanges {
+         //todo: save new dream array as default one
             switch diff.dreamChange {
                 case .inserted?:
                     let indexPath = IndexPath(row: diff.from.dreams.count, section: Section.dreams.rawValue)
@@ -120,6 +168,7 @@ class DreamListViewController: UITableViewController {
         }
 
         if diff.favoriteCreatureChanged {
+         //todo: save new creature as default one
             // Update the favorite creature section header.
             let favoriteCreatureSection = IndexSet(integer: Section.favoriteCreature.rawValue)
             tableView.reloadSections(favoriteCreatureSection, with: .automatic)
