@@ -69,20 +69,20 @@ class DreamListViewController: UITableViewController {
       }
    }
    
-   var n = 1
+   //var n = 1
    
    var crea: [Dream.Creature] {
       var creaAr: [Dream.Creature] = []
       if n > 0 {
          for k in 0...n {
             switch creaArrayName[k] {
-               case "Dragon" :         creaAr.append(Dream.Creature.dragon)
-               case "Shark" :          creaAr.append(Dream.Creature.shark)
-               case "Crusty" :         creaAr.append(Dream.Creature.crusty)
-               case "Pink unicorn" :   creaAr.append(Dream.Creature.unicorn(.pink))
-               case "White unicorn" :  creaAr.append(Dream.Creature.unicorn(.white))
-               case "Yellow unicorn" : creaAr.append(Dream.Creature.unicorn(.yellow))
-               default: creaAr.append(Dream.Creature.shark)
+            case "Dragon" :         creaAr.append(Dream.Creature.dragon) ; print("creaAr added: \(Dream.Creature.dragon)")
+               case "Shark" :          creaAr.append(Dream.Creature.shark) ; print("creaAr added: \(Dream.Creature.shark)")
+               case "Crusty" :         creaAr.append(Dream.Creature.crusty) ; print("creaAr added: \(Dream.Creature.crusty)")
+               case "Pink unicorn" :   creaAr.append(Dream.Creature.unicorn(.pink)) ; print("creaAr added: \(Dream.Creature.unicorn(.pink))")
+               case "White unicorn" :  creaAr.append(Dream.Creature.unicorn(.white)) ; print("creaAr added: \(Dream.Creature.unicorn(.white))")
+               case "Yellow unicorn" : creaAr.append(Dream.Creature.unicorn(.yellow)) ; print("creaAr added: \(Dream.Creature.unicorn(.yellow))")
+               default: creaAr.append(Dream.Creature.shark) ; print("creaAr added: \(Dream.Creature.shark)")
             }
          }
       }
@@ -92,19 +92,17 @@ class DreamListViewController: UITableViewController {
    
    var creaArrayName: [String] {
       var creaArr: [String] = []
-      //for k in 0...n {
-         if let name = UserDefaults.standard.string(forKey: "creatureName0") {
+      for k in 0...n {
+         if let name = UserDefaults.standard.string(forKey: "creatureName\(k)") {
             creaArr.append(name)
+            print("\(name) - name\(k)")
          }
-      //}
+      }
       return creaArr
    }
    
    
-   
-   
-   
-   
+ 
    
    var numberOfCreatures: [Int] {
       get {
@@ -126,12 +124,12 @@ class DreamListViewController: UITableViewController {
       }
    }
    
-   var na: Int {
+   var n: Int {
       get {
-         if let n: Int = UserDefaults.standard.integer(forKey: "n") {
-            if n > 0 {
-               return n
-            }
+         let nr = UserDefaults.standard.integer(forKey: "rowsOfDreams")
+            print("rowsOfDreams= \(nr)")
+            if nr > 0 {
+               return nr
          }
          return 0
       }
@@ -142,7 +140,7 @@ class DreamListViewController: UITableViewController {
          var descrArr: [String] = []
          for k in 0...n {
             if let sss = UserDefaults.standard.string(forKey: "description\(k)") {
-               descrArr.append("0 \(sss)")
+               descrArr.append("\(sss)")
             }
          }
          return descrArr
@@ -156,12 +154,17 @@ class DreamListViewController: UITableViewController {
    var modelCopy2: DreamListViewControllerModel {
     get {
       if n > 0 {
-         //for k in 0...n {
-         //}
-         return DreamListViewControllerModel(favoriteCreature: fCreature, dreams: [
-                  Dream(description: descr[0], creature: crea[0], effects: eff, numberOfCreatures: numberOfCreatures[0]),
-                  Dream(description: descr[1], creature: crea[1], effects: eff, numberOfCreatures: numberOfCreatures[1])
-               ])
+         var dreamArray: [Dream] = []
+         for k in 0...n {
+            dreamArray.append(Dream(description: descr[k], creature: crea[k], effects: eff, numberOfCreatures: numberOfCreatures[k]))
+         }
+         
+         return Model(favoriteCreature: fCreature, dreams: dreamArray)
+         
+//         return DreamListViewControllerModel(favoriteCreature: fCreature, dreams: [
+//                  Dream(description: descr[0], creature: crea[0], effects: eff, numberOfCreatures: numberOfCreatures[0]),
+//                  Dream(description: descr[1], creature: crea[1], effects: eff, numberOfCreatures: numberOfCreatures[1])
+//               ])
       }
       return Model.initial
       }
@@ -226,7 +229,8 @@ class DreamListViewController: UITableViewController {
       
       let favoriteCreature = model.favoriteCreature.name as NSString
       UserDefaults.standard.set(favoriteCreature, forKey: "favoriteCreature")
-      
+      UserDefaults.standard.set(model.dreams.count-1, forKey: "rowsOfDreams")
+
       //saves data for each dream
       var k = 0
       for dreamItem in model.dreams {
@@ -246,7 +250,6 @@ class DreamListViewController: UITableViewController {
             j+=1
          }
          
-         UserDefaults.standard.set(k, forKey: "n")
          k+=1
       }
 
