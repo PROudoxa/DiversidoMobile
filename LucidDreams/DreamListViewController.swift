@@ -49,13 +49,6 @@ class DreamListViewController: UITableViewController {
     private var model = Model.initial
 
 
-//   var favoriteCreatureName: String {
-//      if let favoriteCreatureName = UserDefaults.standard.string(forKey: "favoriteCreature") {
-//         return favoriteCreatureName
-//      }
-//      return "shark"
-//   }
-   
    var fCreature: Dream.Creature {
       if let favoriteCreatureName = UserDefaults.standard.string(forKey: "favoriteCreature") {
          switch favoriteCreatureName {
@@ -124,8 +117,9 @@ class DreamListViewController: UITableViewController {
                let setSize = UserDefaults.standard.integer(forKey: "sizeEffectsArray n=\(k)")
                var setEffects: Set<Dream.Effect> = []
                if setSize > 0 {  //size of current dream effects array
-                  for index in 0...setSize {
+                  for index in 0...setSize-1 {
                      if let nameWithTail = UserDefaults.standard.string(forKey: "DreamEffectsNamek=\(k)j=\(index)") {
+                        print("restored EffectNamek=\(k)j=\(index)  \(nameWithTail)")
                         let components = nameWithTail.components(separatedBy: "Particle")
                         if !components.isEmpty {
                            let name = components[0].lowercased()
@@ -144,6 +138,7 @@ class DreamListViewController: UITableViewController {
                }
                setEffectsArr.append(setEffects)
             }
+            print("setEffectsArr: \(setEffectsArr)")
             return setEffectsArr
          }
          return [[.fireBreathing], [.laserFocus, .magic], [.fireBreathing, .laserFocus]]
@@ -246,7 +241,6 @@ class DreamListViewController: UITableViewController {
       
       
       let favoriteCreature = model.favoriteCreature.name as NSString
-      print("saved favoriteCreatureName: \(favoriteCreature)")
       UserDefaults.standard.set(favoriteCreature, forKey: "favoriteCreature")
       UserDefaults.standard.set(model.dreams.count-1, forKey: "rowsOfDreams")
 
@@ -269,10 +263,14 @@ class DreamListViewController: UITableViewController {
             sizeOfSet = setEffects.count
             let effectName = effect.resourceName as NSString
             UserDefaults.standard.set(effectName, forKey: "DreamEffectsNamek=\(k)j=\(index)")
+            
+            print("saved EffectNamek=\(k)j=\(index) name Value: \(effectName)")
+            
             index += 1
          }
          
          UserDefaults.standard.set(sizeOfSet, forKey: "sizeEffectsArray n=\(k)")
+         print("\(k).\(index) size: \(sizeOfSet)")
          k+=1
       }
 
