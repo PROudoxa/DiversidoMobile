@@ -48,142 +48,15 @@ class DreamListViewController: UITableViewController {
     private var state = State.viewing
     private var model = Model.initial
 
-
-   var fCreature: Dream.Creature {
-      if let favoriteCreatureName = UserDefaults.standard.string(forKey: "favoriteCreature") {
-         switch favoriteCreatureName {
-            case "Dragon" :         return Dream.Creature.dragon
-            case "Shark" :          return Dream.Creature.shark
-            case "Crusty" :         return Dream.Creature.crusty
-            case "Pink unicorn" :   return Dream.Creature.unicorn(.pink)
-            case "White unicorn" :  return Dream.Creature.unicorn(.white)
-            case "Yellow unicorn" : return Dream.Creature.unicorn(.yellow)
-            default:                return Dream.Creature.shark
-         }
-      }
-      return Dream.Creature.shark
-   }
+    // Initialization. uses saved data and returns gathered model
+    private var modelSaved:         DreamListViewControllerModel  {get{ return getSavedModel()                }}
+    private var favoriteCreature:   Dream.Creature                {get{ return getSavedFavoriteCreature()     }}
+    private var n:                  Int                           {get{ return getSavedTotalNumberOfDreams()  }}
+    private var creaturesArray:     [Dream.Creature]              {get{ return getSavedDreamCreatureArray()   }}
+    private var descriptionArray:   [String]                      {get{ return getSavedDescriptionArray()     }}
+    private var numberOfCreatures:  [Int]                         {get{ return getSavedNumbersOfCreeatures()  }}
+    private var arrayOfEffectsSets: [Set<Dream.Effect>]           {get{ return getSetsOfEffects()             }}
    
-   var crea: [Dream.Creature] {
-      get {
-         var creaAr: [Dream.Creature] = []
-         if n > 0 {
-            for k in 0...n {
-               switch creaArrayName[k] {
-               case "Dragon" :         creaAr.append(Dream.Creature.dragon)
-               case "Shark" :          creaAr.append(Dream.Creature.shark)
-               case "Crusty" :         creaAr.append(Dream.Creature.crusty)
-               case "Pink unicorn" :   creaAr.append(Dream.Creature.unicorn(.pink))
-               case "White unicorn" :  creaAr.append(Dream.Creature.unicorn(.white))
-               case "Yellow unicorn" : creaAr.append(Dream.Creature.unicorn(.yellow))
-               default:                creaAr.append(Dream.Creature.shark)
-               }
-            }
-            return creaAr
-         }
-         return [.unicorn(.pink), .unicorn(.yellow), .unicorn(.white)]
-      }
-   }
-   
-   var creaArrayName: [String] {
-      var creaArr: [String] = []
-      for k in 0...n {
-         if let name = UserDefaults.standard.string(forKey: "creatureName\(k)") {
-            creaArr.append(name)
-         }
-      }
-      return creaArr
-   }
-   
-   var numberOfCreatures: [Int] {
-      get {
-         if n < 0 {
-            var numberOfCreatures: [Int] = []
-            for k in 0...n {
-               let quantityOfDreams: Int = UserDefaults.standard.integer(forKey: "numberOfCreatures\(k)")
-               numberOfCreatures.append(quantityOfDreams)
-            }
-            return numberOfCreatures
-         }
-         return [1, 2, 3]
-      }
-   }
-   
-   var setEffectsArray: [Set<Dream.Effect>] {
-      get {
-         if n > 0 {
-            var setEffectsArr: [Set<Dream.Effect>] = []
-            for k in 0...n {
-               let setSize = UserDefaults.standard.integer(forKey: "sizeEffectsArray n=\(k)")
-               var setEffects: Set<Dream.Effect> = []
-               if setSize > 0 {  //size of current dream effects array
-                  for index in 0...setSize-1 {
-                     if let nameWithTail = UserDefaults.standard.string(forKey: "DreamEffectsNamek=\(k)j=\(index)") {
-                        print("restored EffectNamek=\(k)j=\(index)  \(nameWithTail)")
-                        let components = nameWithTail.components(separatedBy: "Particle")
-                        if !components.isEmpty {
-                           let name = components[0].lowercased()
-                           switch name {
-                           case "firebreathing" :  setEffects.insert(Dream.Effect.fireBreathing)
-                           case "laserfocus" :     setEffects.insert(Dream.Effect.laserFocus)
-                           case "fireflies" :      setEffects.insert(Dream.Effect.fireflies)
-                           case "magic" :          setEffects.insert(Dream.Effect.magic)
-                           case "rain" :           setEffects.insert(Dream.Effect.rain)
-                           case "snow" :           setEffects.insert(Dream.Effect.snow)
-                           default:                setEffects.insert(Dream.Effect.snow)
-                           }
-                        }
-                     }
-                  }
-               }
-               setEffectsArr.append(setEffects)
-            }
-            print("setEffectsArr: \(setEffectsArr)")
-            return setEffectsArr
-         }
-         return [[.fireBreathing], [.laserFocus, .magic], [.fireBreathing, .laserFocus]]
-      }
-   }
-   
-   var n: Int {
-      get {
-         let rows = UserDefaults.standard.integer(forKey: "rowsOfDreams")
-            if rows > 0 {
-               return rows
-         }
-         return 2
-      }
-   }
-   
-   var descr: [String] {
-      get {
-         if n > 0 {
-            var descrArr: [String] = []
-            for k in 0...n {
-               if let descr = UserDefaults.standard.string(forKey: "description\(k)") {
-                  descrArr.append("\(descr)")
-               }
-            }
-            return descrArr
-         }
-         return ["Dream 1", "Dream 2", "Dream 3"]
-      }
-   }
-   
-   var modelCopy2: DreamListViewControllerModel {
-    get {
-      if n > 0 {
-         var dreamArray: [Dream] = []
-         for index in 0...n {
-            dreamArray.append(Dream(description: descr[index], creature: crea[index], effects: setEffectsArray[index], numberOfCreatures: numberOfCreatures[index]))
-         }
-         return Model(favoriteCreature: fCreature, dreams: dreamArray)
-      }
-      return Model.initial
-      }
-   }
-
-
 
     /// A stored undo manager instance for the `undoManager` property.
     let _undoManager = UndoManager()
@@ -237,15 +110,13 @@ class DreamListViewController: UITableViewController {
 
     /// Diffs the model changes and updates the UI based on the new model.
     private func modelDidChange(diff: Model.Diff) {
-//saver
       
-      
+      // saves model
       let favoriteCreature = model.favoriteCreature.name as NSString
       UserDefaults.standard.set(favoriteCreature, forKey: "favoriteCreature")
-      UserDefaults.standard.set(model.dreams.count-1, forKey: "rowsOfDreams")
+      UserDefaults.standard.set(model.dreams.count-1, forKey: "rowsQuantity")
 
-      //saves data for each dream
-      var k = 0
+      var k = 0  //current dream row
       for dreamItem in model.dreams {
          let des = dreamItem.description as NSString
          let creatureName = dreamItem.creature.name as NSString
@@ -255,29 +126,22 @@ class DreamListViewController: UITableViewController {
          UserDefaults.standard.set(creatureName, forKey: "creatureName\(k)")
          UserDefaults.standard.set(numberOfCreatures, forKey: "numberOfCreatures\(k)")
          
-         var index = 0
-         var sizeOfSet = 0
+         var index = 0       // current item in the set
+         var sizeOfSet = 0   // size of current set
          
          let setEffects: Set<Dream.Effect> = dreamItem.effects
          for effect in setEffects {
             sizeOfSet = setEffects.count
             let effectName = effect.resourceName as NSString
             UserDefaults.standard.set(effectName, forKey: "DreamEffectsNamek=\(k)j=\(index)")
-            
-            print("saved EffectNamek=\(k)j=\(index) name Value: \(effectName)")
-            
+
             index += 1
          }
          
-         UserDefaults.standard.set(sizeOfSet, forKey: "sizeEffectsArray n=\(k)")
-         print("\(k).\(index) size: \(sizeOfSet)")
+         UserDefaults.standard.set(sizeOfSet, forKey: "sizeOfSet\(k)")
+
          k+=1
       }
-
-
-      
-      
-      
       
         // Check to see if we need to update any rows that present a dream.
         if diff.hasAnyDreamChanges {
@@ -478,7 +342,8 @@ class DreamListViewController: UITableViewController {
 
     override func viewDidLoad() {
         stateDidChange()
-model = modelCopy2  //replace model with saved one
+        model = modelSaved  // initialization | replaces default model with saved(before the app was shutdowned previous time) one
+      
         tableView.allowsMultipleSelectionDuringEditing = true
 
         tableView.register(CreatureCell.self, forCellReuseIdentifier: CreatureCell.reuseIdentifier)
@@ -710,4 +575,129 @@ model = modelCopy2  //replace model with saved one
             })
         }
     }
+   
+   
+   // MARK: INITIALIZATION using saved model
+   
+   //for section "Favorite Creature"
+   func getSavedFavoriteCreature() -> Dream.Creature {
+      if let favoriteCreatureName = UserDefaults.standard.string(forKey: "favoriteCreature") {
+         switch favoriteCreatureName {
+         case "Dragon" :         return Dream.Creature.dragon
+         case "Shark" :          return Dream.Creature.shark
+         case "Crusty" :         return Dream.Creature.crusty
+         case "Pink unicorn" :   return Dream.Creature.unicorn(.pink)
+         case "White unicorn" :  return Dream.Creature.unicorn(.white)
+         case "Yellow unicorn" : return Dream.Creature.unicorn(.yellow)
+         default:                return Dream.Creature.shark
+         }
+      }
+      return Dream.Creature.shark
+   }
+   
+   // for section "Dreams"
+   func getSavedModel() -> DreamListViewControllerModel {
+      if n > 0 {
+         var dreamsArray: [Dream] = []
+         for index in 0...n {
+            dreamsArray.append(Dream(description: descriptionArray[index], creature: creaturesArray[index], effects: arrayOfEffectsSets[index], numberOfCreatures: numberOfCreatures[index]))
+         }
+         return Model(favoriteCreature: favoriteCreature, dreams: dreamsArray)
+      }
+      return Model.initial
+/*                            sample(dafault model)
+         DreamListViewControllerModel(favoriteCreature: .unicorn(.pink), dreams: [
+      Dream(description: "Dream 1", creature: .unicorn(.pink), effects: [.fireBreathing]),
+      Dream(description: "Dream 2", creature: .unicorn(.yellow), effects: [.laserFocus, .magic], numberOfCreatures: 2),
+      Dream(description: "Dream 3", creature: .unicorn(.white), effects: [.fireBreathing, .laserFocus], numberOfCreatures: 3)
+       ])
+*/
+   }
+   
+   func getSavedTotalNumberOfDreams() -> Int {
+      let rowsQuantity = UserDefaults.standard.integer(forKey: "rowsQuantity")
+      if rowsQuantity > 0 {
+         return rowsQuantity
+      }
+      return 2
+   }
+   
+   func getSavedDescriptionArray() -> [String] {
+      if n > 0 {
+         var descrArr: [String] = []
+         for k in 0...n {
+            if let descr = UserDefaults.standard.string(forKey: "description\(k)") {
+               descrArr.append("\(descr)")
+            }
+         }
+         return descrArr
+      }
+      return ["Dream 1", "Dream 2", "Dream 3"]
+   }
+   
+   func getSavedDreamCreatureArray() -> [Dream.Creature] {
+      var creaturesArray: [Dream.Creature] = []
+      if n > 0 {
+         for k in 0...n {   //k - current dream row
+            if let name = UserDefaults.standard.string(forKey: "creatureName\(k)") {
+               switch name {
+                  case "Dragon" :         creaturesArray.append(Dream.Creature.dragon)
+                  case "Shark" :          creaturesArray.append(Dream.Creature.shark)
+                  case "Crusty" :         creaturesArray.append(Dream.Creature.crusty)
+                  case "Pink unicorn" :   creaturesArray.append(Dream.Creature.unicorn(.pink))
+                  case "White unicorn" :  creaturesArray.append(Dream.Creature.unicorn(.white))
+                  case "Yellow unicorn" : creaturesArray.append(Dream.Creature.unicorn(.yellow))
+                  default:                creaturesArray.append(Dream.Creature.shark)
+               }
+            }
+         }
+         return creaturesArray
+      }
+      return [.unicorn(.pink), .unicorn(.yellow), .unicorn(.white)]
+   }
+   
+   func getSetsOfEffects() -> [Set<Dream.Effect>] { // k = index of current row(dream), index = index of current effect in set
+      if n > 0 {                                    // same as two-dimensional array
+         var setEffectsArr: [Set<Dream.Effect>] = []
+         for k in 0...n {
+            let setSize = UserDefaults.standard.integer(forKey: "sizeOfSet\(k)")
+            var setEffects: Set<Dream.Effect> = []
+            if setSize > 0 {  //size of current dream effects array
+               for index in 0...setSize-1 {
+                  if let nameWithTail = UserDefaults.standard.string(forKey: "DreamEffectsNamek=\(k)j=\(index)") {
+                     let components = nameWithTail.components(separatedBy: "Particle")
+                     if !components.isEmpty {
+                        let name = components[0].lowercased()
+                        switch name {
+                           case "firebreathing" :  setEffects.insert(Dream.Effect.fireBreathing)
+                           case "laserfocus" :     setEffects.insert(Dream.Effect.laserFocus)
+                           case "fireflies" :      setEffects.insert(Dream.Effect.fireflies)
+                           case "magic" :          setEffects.insert(Dream.Effect.magic)
+                           case "rain" :           setEffects.insert(Dream.Effect.rain)
+                           case "snow" :           setEffects.insert(Dream.Effect.snow)
+                           default:                setEffects.insert(Dream.Effect.snow)
+                        }
+                     }
+                  }
+               }
+            }
+            setEffectsArr.append(setEffects)
+         }
+         return setEffectsArr
+      }
+      return [[.fireBreathing], [.laserFocus, .magic], [.fireBreathing, .laserFocus]]
+   }
+
+   func getSavedNumbersOfCreeatures() -> [Int] {
+      if n > 0 {
+         var numberOfCreatures: [Int] = []
+         for k in 0...n {
+            let quantityOfDreams: Int = UserDefaults.standard.integer(forKey: "numberOfCreatures\(k)")
+            numberOfCreatures.append(quantityOfDreams)
+         }
+         return numberOfCreatures
+      }
+      return [1, 2, 3]
+   }
+   
 }
