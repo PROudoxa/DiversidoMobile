@@ -46,6 +46,8 @@ class CreatureCell: UITableViewCell {
     }
 
     required init?(coder aDecoder: NSCoder) {
+      //todo: decode saved dream cell here
+      // implement encode nearby
         fatalError("\(#function) has not been implemented")
     }
 
