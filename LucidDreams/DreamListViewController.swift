@@ -49,122 +49,140 @@ class DreamListViewController: UITableViewController {
     private var model = Model.initial
 
 
-   //let fCreatureDefault: String = "Pink unicorn"
-   var favoriteCreatureName: String {
-      if let favoriteCreatureName = UserDefaults.standard.string(forKey: "favoriteCreature") {
-         return favoriteCreatureName
-      }
-      return "shark"
-   }
+//   var favoriteCreatureName: String {
+//      if let favoriteCreatureName = UserDefaults.standard.string(forKey: "favoriteCreature") {
+//         return favoriteCreatureName
+//      }
+//      return "shark"
+//   }
    
    var fCreature: Dream.Creature {
-      switch favoriteCreatureName {
-         case "dragon" :         return Dream.Creature.dragon
-         case "shark" :          return Dream.Creature.shark
-         case "crusty" :         return Dream.Creature.crusty
-         case "unicorn-pink" :   return Dream.Creature.unicorn(.pink)
-         case "unicorn-white" :  return Dream.Creature.unicorn(.white)
-         case "unicorn-yellow" : return Dream.Creature.unicorn(.yellow)
-         default:                return Dream.Creature.shark
-      }
-   }
-   
-   //var n = 1
-   
-   var crea: [Dream.Creature] {
-      var creaAr: [Dream.Creature] = []
-      if n > 0 {
-         for k in 0...n {
-            switch creaArrayName[k] {
-            case "Dragon" :         creaAr.append(Dream.Creature.dragon) ; print("creaAr added: \(Dream.Creature.dragon)")
-               case "Shark" :          creaAr.append(Dream.Creature.shark) ; print("creaAr added: \(Dream.Creature.shark)")
-               case "Crusty" :         creaAr.append(Dream.Creature.crusty) ; print("creaAr added: \(Dream.Creature.crusty)")
-               case "Pink unicorn" :   creaAr.append(Dream.Creature.unicorn(.pink)) ; print("creaAr added: \(Dream.Creature.unicorn(.pink))")
-               case "White unicorn" :  creaAr.append(Dream.Creature.unicorn(.white)) ; print("creaAr added: \(Dream.Creature.unicorn(.white))")
-               case "Yellow unicorn" : creaAr.append(Dream.Creature.unicorn(.yellow)) ; print("creaAr added: \(Dream.Creature.unicorn(.yellow))")
-               default: creaAr.append(Dream.Creature.shark) ; print("creaAr added: \(Dream.Creature.shark)")
-            }
+      if let favoriteCreatureName = UserDefaults.standard.string(forKey: "favoriteCreature") {
+         switch favoriteCreatureName {
+            case "Dragon" :         return Dream.Creature.dragon
+            case "Shark" :          return Dream.Creature.shark
+            case "Crusty" :         return Dream.Creature.crusty
+            case "Pink unicorn" :   return Dream.Creature.unicorn(.pink)
+            case "White unicorn" :  return Dream.Creature.unicorn(.white)
+            case "Yellow unicorn" : return Dream.Creature.unicorn(.yellow)
+            default:                return Dream.Creature.shark
          }
       }
-      return creaAr
+      return Dream.Creature.shark
    }
    
+   var crea: [Dream.Creature] {
+      get {
+         var creaAr: [Dream.Creature] = []
+         if n > 0 {
+            for k in 0...n {
+               switch creaArrayName[k] {
+               case "Dragon" :         creaAr.append(Dream.Creature.dragon)
+               case "Shark" :          creaAr.append(Dream.Creature.shark)
+               case "Crusty" :         creaAr.append(Dream.Creature.crusty)
+               case "Pink unicorn" :   creaAr.append(Dream.Creature.unicorn(.pink))
+               case "White unicorn" :  creaAr.append(Dream.Creature.unicorn(.white))
+               case "Yellow unicorn" : creaAr.append(Dream.Creature.unicorn(.yellow))
+               default:                creaAr.append(Dream.Creature.shark)
+               }
+            }
+            return creaAr
+         }
+         return [.unicorn(.pink), .unicorn(.yellow), .unicorn(.white)]
+      }
+   }
    
    var creaArrayName: [String] {
       var creaArr: [String] = []
       for k in 0...n {
          if let name = UserDefaults.standard.string(forKey: "creatureName\(k)") {
             creaArr.append(name)
-            print("\(name) - name\(k)")
          }
       }
       return creaArr
    }
    
-   
- 
-   
    var numberOfCreatures: [Int] {
       get {
-         var numberOfCreatures: [Int] = []
-         for k in 0...n {
-            let quantityOfDreams: Int = UserDefaults.standard.integer(forKey: "numberOfCreatures\(k)")
+         if n < 0 {
+            var numberOfCreatures: [Int] = []
+            for k in 0...n {
+               let quantityOfDreams: Int = UserDefaults.standard.integer(forKey: "numberOfCreatures\(k)")
                numberOfCreatures.append(quantityOfDreams)
+            }
+            return numberOfCreatures
          }
-         return numberOfCreatures
+         return [1, 2, 3]
       }
    }
    
-   var eff: Set<Dream.Effect> {
+   var setEffectsArray: [Set<Dream.Effect>] {
       get {
-         if 5<6 {       //dreamArray[0].effects.popFirst() archive !=nil
-            return [Dream.Effect.fireBreathing]
+         if n > 0 {
+            var setEffectsArr: [Set<Dream.Effect>] = []
+            for k in 0...n {
+               let setSize = UserDefaults.standard.integer(forKey: "sizeEffectsArray n=\(k)")
+               var setEffects: Set<Dream.Effect> = []
+               if setSize > 0 {  //size of current dream effects array
+                  for index in 0...setSize {
+                     if let nameWithTail = UserDefaults.standard.string(forKey: "DreamEffectsNamek=\(k)j=\(index)") {
+                        let components = nameWithTail.components(separatedBy: "Particle")
+                        if !components.isEmpty {
+                           let name = components[0].lowercased()
+                           switch name {
+                           case "firebreathing" :  setEffects.insert(Dream.Effect.fireBreathing)
+                           case "laserfocus" :     setEffects.insert(Dream.Effect.laserFocus)
+                           case "fireflies" :      setEffects.insert(Dream.Effect.fireflies)
+                           case "magic" :          setEffects.insert(Dream.Effect.magic)
+                           case "rain" :           setEffects.insert(Dream.Effect.rain)
+                           case "snow" :           setEffects.insert(Dream.Effect.snow)
+                           default:                setEffects.insert(Dream.Effect.snow)
+                           }
+                        }
+                     }
+                  }
+               }
+               setEffectsArr.append(setEffects)
+            }
+            return setEffectsArr
          }
-         return [Dream.Effect.snow]
+         return [[.fireBreathing], [.laserFocus, .magic], [.fireBreathing, .laserFocus]]
       }
    }
    
    var n: Int {
       get {
-         let nr = UserDefaults.standard.integer(forKey: "rowsOfDreams")
-            print("rowsOfDreams= \(nr)")
-            if nr > 0 {
-               return nr
+         let rows = UserDefaults.standard.integer(forKey: "rowsOfDreams")
+            if rows > 0 {
+               return rows
          }
-         return 0
+         return 2
       }
    }
    
    var descr: [String] {
       get {
-         var descrArr: [String] = []
-         for k in 0...n {
-            if let sss = UserDefaults.standard.string(forKey: "description\(k)") {
-               descrArr.append("\(sss)")
+         if n > 0 {
+            var descrArr: [String] = []
+            for k in 0...n {
+               if let descr = UserDefaults.standard.string(forKey: "description\(k)") {
+                  descrArr.append("\(descr)")
+               }
             }
+            return descrArr
          }
-         return descrArr
+         return ["Dream 1", "Dream 2", "Dream 3"]
       }
    }
-   
-
-   
-   
    
    var modelCopy2: DreamListViewControllerModel {
     get {
       if n > 0 {
          var dreamArray: [Dream] = []
-         for k in 0...n {
-            dreamArray.append(Dream(description: descr[k], creature: crea[k], effects: eff, numberOfCreatures: numberOfCreatures[k]))
+         for index in 0...n {
+            dreamArray.append(Dream(description: descr[index], creature: crea[index], effects: setEffectsArray[index], numberOfCreatures: numberOfCreatures[index]))
          }
-         
          return Model(favoriteCreature: fCreature, dreams: dreamArray)
-         
-//         return DreamListViewControllerModel(favoriteCreature: fCreature, dreams: [
-//                  Dream(description: descr[0], creature: crea[0], effects: eff, numberOfCreatures: numberOfCreatures[0]),
-//                  Dream(description: descr[1], creature: crea[1], effects: eff, numberOfCreatures: numberOfCreatures[1])
-//               ])
       }
       return Model.initial
       }
@@ -228,13 +246,13 @@ class DreamListViewController: UITableViewController {
       
       
       let favoriteCreature = model.favoriteCreature.name as NSString
+      print("saved favoriteCreatureName: \(favoriteCreature)")
       UserDefaults.standard.set(favoriteCreature, forKey: "favoriteCreature")
       UserDefaults.standard.set(model.dreams.count-1, forKey: "rowsOfDreams")
 
       //saves data for each dream
       var k = 0
       for dreamItem in model.dreams {
-         var dreamItemHelper = dreamItem
          let des = dreamItem.description as NSString
          let creatureName = dreamItem.creature.name as NSString
          let numberOfCreatures = dreamItem.numberOfCreatures as NSNumber
@@ -243,13 +261,18 @@ class DreamListViewController: UITableViewController {
          UserDefaults.standard.set(creatureName, forKey: "creatureName\(k)")
          UserDefaults.standard.set(numberOfCreatures, forKey: "numberOfCreatures\(k)")
          
-         var j = 0
-         while let effect = dreamItemHelper.effects.popFirst() {
+         var index = 0
+         var sizeOfSet = 0
+         
+         let setEffects: Set<Dream.Effect> = dreamItem.effects
+         for effect in setEffects {
+            sizeOfSet = setEffects.count
             let effectName = effect.resourceName as NSString
-            UserDefaults.standard.set(effectName, forKey: "\(String(describing: effectName)) k=\(k) j=\(j)")
-            j+=1
+            UserDefaults.standard.set(effectName, forKey: "DreamEffectsNamek=\(k)j=\(index)")
+            index += 1
          }
          
+         UserDefaults.standard.set(sizeOfSet, forKey: "sizeEffectsArray n=\(k)")
          k+=1
       }
 
