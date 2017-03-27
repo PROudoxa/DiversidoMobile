@@ -118,25 +118,11 @@ class FavoriteCreatureListViewController: UITableViewController {
     // MARK: IBActions
 
     @IBAction func cancelTapped() {
-      
-
-      
         dismiss(animated: true, completion: nil)
    }
 
     @IBAction func doneTapped() {
-      
-      let name = favoriteCreature.name
-      let data = NSKeyedArchiver.archivedData(withRootObject: name)
-      UserDefaults.standard.set(data, forKey: "name")
-      print("(from doneTapped) name: \(name)")
-      
-      
-      
-
-      
         favoriteCreatureDidChange?(favoriteCreature)
         dismiss(animated: true, completion: nil)
-      //todo: to save last choice
     }
 }
