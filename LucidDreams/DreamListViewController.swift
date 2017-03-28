@@ -311,7 +311,7 @@ class DreamListViewController: UITableViewController {
 
     override func viewDidLoad() {
         stateDidChange()
-        model = modelSaved  // initialization | replaces default model with saved(before the app was shutdowned previous time) one
+        model = modelSaved  // initialization | replaces default model with saved one
       
         tableView.allowsMultipleSelectionDuringEditing = true
 
@@ -472,17 +472,16 @@ class DreamListViewController: UITableViewController {
                 }
 
             case .pickFavoriteCreature:
-                let navigationController = segue.destination as! UINavigationController
 
-                let detailViewController = navigationController.viewControllers.first! as! FavoriteCreatureListViewController
+                let favoriteCreatureListViewController = segue.destination as! FavoriteCreatureListViewController
 
-                detailViewController.setFavoriteCreature(model.favoriteCreature)
+                favoriteCreatureListViewController.setFavoriteCreature(model.favoriteCreature)
 
                 /*
                     Register for any changes to the favorite creature while its
                     being selected.
                 */
-                detailViewController.favoriteCreatureDidChange = { [weak self] newFavoriteCreature in
+                favoriteCreatureListViewController.favoriteCreatureDidChange = { [weak self] newFavoriteCreature in
                     guard let strongSelf = self else { return }
 
                     strongSelf.withValues { model, _ in
@@ -555,7 +554,7 @@ class DreamListViewController: UITableViewController {
    }
    
    private func saveDreamsForModel() {
-      DispatchQueue.global(qos: .background).async {
+     // DispatchQueue.global(qos: .background).async { //todo: fix the problem with time latency which makes troubles with saving
          
          UserDefaults.standard.set(self.model.dreams.count-1, forKey: "rowsQuantity")
          
@@ -585,7 +584,7 @@ class DreamListViewController: UITableViewController {
             
             k+=1
          }
-      }
+      //}
    }
    
    // MARK: INITIALIZATION using saved model. Model Restoration
@@ -667,7 +666,7 @@ class DreamListViewController: UITableViewController {
       return [.unicorn(.pink), .unicorn(.yellow), .unicorn(.white)]
    }
    
-   private func getSetsOfEffects() -> [Set<Dream.Effect>] { // k = index of current row(dream), index = index of current effect in set
+   private func getSetsOfEffects() -> [Set<Dream.Effect>] { // k = index of current row(dream), index = index of current effect in the set
       if n > 0 {                                            // same as a two-dimensional array
          var setEffectsArr: [Set<Dream.Effect>] = []
          for k in 0...n {

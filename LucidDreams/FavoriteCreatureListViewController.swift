@@ -118,11 +118,11 @@ class FavoriteCreatureListViewController: UITableViewController {
     // MARK: IBActions
 
     @IBAction func cancelTapped() {
-        dismiss(animated: true, completion: nil)
+      self.navigationController?.popViewController(animated: true)
    }
 
     @IBAction func doneTapped() {
         favoriteCreatureDidChange?(favoriteCreature)
-        dismiss(animated: true, completion: nil)
+      self.navigationController?.popViewController(animated: true)
     }
 }
