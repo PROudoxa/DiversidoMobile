@@ -110,42 +110,8 @@ class DreamListViewController: UITableViewController {
 
     /// Diffs the model changes and updates the UI based on the new model.
     private func modelDidChange(diff: Model.Diff) {
-      
-      // saves model
-      let favoriteCreature = model.favoriteCreature.name as NSString
-      UserDefaults.standard.set(favoriteCreature, forKey: "favoriteCreature")
-      UserDefaults.standard.set(model.dreams.count-1, forKey: "rowsQuantity")
-
-      var k = 0  //current dream row
-      for dreamItem in model.dreams {
-         let des = dreamItem.description as NSString
-         let creatureName = dreamItem.creature.name as NSString
-         let numberOfCreatures = dreamItem.numberOfCreatures as NSNumber
-         
-         UserDefaults.standard.set(des, forKey: "description\(k)")
-         UserDefaults.standard.set(creatureName, forKey: "creatureName\(k)")
-         UserDefaults.standard.set(numberOfCreatures, forKey: "numberOfCreatures\(k)")
-         
-         var index = 0       // current item in the set
-         var sizeOfSet = 0   // size of current set
-         
-         let setEffects: Set<Dream.Effect> = dreamItem.effects
-         for effect in setEffects {
-            sizeOfSet = setEffects.count
-            let effectName = effect.resourceName as NSString
-            UserDefaults.standard.set(effectName, forKey: "DreamEffectsNamek=\(k)j=\(index)")
-
-            index += 1
-         }
-         
-         UserDefaults.standard.set(sizeOfSet, forKey: "sizeOfSet\(k)")
-
-         k+=1
-      }
-      
         // Check to see if we need to update any rows that present a dream.
         if diff.hasAnyDreamChanges {
-         //todo: save new dream array as default one
             switch diff.dreamChange {
                 case .inserted?:
                     let indexPath = IndexPath(row: diff.from.dreams.count, section: Section.dreams.rawValue)
@@ -161,14 +127,17 @@ class DreamListViewController: UITableViewController {
 
                 case nil: break
             }
-        }
+            saveDreamsForModel()
+         }
 
         if diff.favoriteCreatureChanged {
-         //todo: save new creature as default one
             // Update the favorite creature section header.
             let favoriteCreatureSection = IndexSet(integer: Section.favoriteCreature.rawValue)
             tableView.reloadSections(favoriteCreatureSection, with: .automatic)
-        }
+         
+            //saves the last user's choice for favourite creature section
+            saveFavouriteCreatureForModel()
+         }
 
         // Need to register any undo changes.
         if diff.hasAnyChanges {
@@ -576,11 +545,53 @@ class DreamListViewController: UITableViewController {
         }
     }
    
+   // MARK: Preserving model
    
-   // MARK: INITIALIZATION using saved model
+   private func saveFavouriteCreatureForModel() {
+      DispatchQueue.global(qos: .background).async {
+         let favoriteCreature = self.model.favoriteCreature.name as NSString
+         UserDefaults.standard.set(favoriteCreature, forKey: "favoriteCreature")
+      }
+   }
+   
+   private func saveDreamsForModel() {
+      DispatchQueue.global(qos: .background).async {
+         
+         UserDefaults.standard.set(self.model.dreams.count-1, forKey: "rowsQuantity")
+         
+         var k = 0  //current dream row
+         for dreamItem in self.model.dreams {
+            let des = dreamItem.description as NSString
+            let creatureName = dreamItem.creature.name as NSString
+            let numberOfCreatures = dreamItem.numberOfCreatures as NSNumber
+            
+            UserDefaults.standard.set(des, forKey: "description\(k)")
+            UserDefaults.standard.set(creatureName, forKey: "creatureName\(k)")
+            UserDefaults.standard.set(numberOfCreatures, forKey: "numberOfCreatures\(k)")
+            
+            var index = 0       // current item in the set
+            var sizeOfSet = 0   // size of current set
+            
+            let setEffects: Set<Dream.Effect> = dreamItem.effects
+            for effect in setEffects {
+               sizeOfSet = setEffects.count
+               let effectName = effect.resourceName as NSString
+               UserDefaults.standard.set(effectName, forKey: "DreamEffectsNamek=\(k)j=\(index)")
+               
+               index += 1
+            }
+            
+            UserDefaults.standard.set(sizeOfSet, forKey: "sizeOfSet\(k)")
+            
+            k+=1
+         }
+      }
+   }
+   
+   // MARK: INITIALIZATION using saved model. Model Restoration
    
    //for section "Favorite Creature"
-   func getSavedFavoriteCreature() -> Dream.Creature {
+   private func getSavedFavoriteCreature() -> Dream.Creature {
       if let favoriteCreatureName = UserDefaults.standard.string(forKey: "favoriteCreature") {
          switch favoriteCreatureName {
          case "Dragon" :         return Dream.Creature.dragon
@@ -596,7 +607,7 @@ class DreamListViewController: UITableViewController {
    }
    
    // for section "Dreams"
-   func getSavedModel() -> DreamListViewControllerModel {
+   private func getSavedModel() -> DreamListViewControllerModel {
       if n > 0 {
          var dreamsArray: [Dream] = []
          for index in 0...n {
@@ -614,7 +625,7 @@ class DreamListViewController: UITableViewController {
 */
    }
    
-   func getSavedTotalNumberOfDreams() -> Int {
+   private func getSavedTotalNumberOfDreams() -> Int {
       let rowsQuantity = UserDefaults.standard.integer(forKey: "rowsQuantity")
       if rowsQuantity > 0 {
          return rowsQuantity
@@ -622,7 +633,7 @@ class DreamListViewController: UITableViewController {
       return 2
    }
    
-   func getSavedDescriptionArray() -> [String] {
+   private func getSavedDescriptionArray() -> [String] {
       if n > 0 {
          var descrArr: [String] = []
          for k in 0...n {
@@ -635,7 +646,7 @@ class DreamListViewController: UITableViewController {
       return ["Dream 1", "Dream 2", "Dream 3"]
    }
    
-   func getSavedDreamCreatureArray() -> [Dream.Creature] {
+   private func getSavedDreamCreatureArray() -> [Dream.Creature] {
       var creaturesArray: [Dream.Creature] = []
       if n > 0 {
          for k in 0...n {   //k - current dream row
@@ -656,8 +667,8 @@ class DreamListViewController: UITableViewController {
       return [.unicorn(.pink), .unicorn(.yellow), .unicorn(.white)]
    }
    
-   func getSetsOfEffects() -> [Set<Dream.Effect>] { // k = index of current row(dream), index = index of current effect in set
-      if n > 0 {                                    // same as two-dimensional array
+   private func getSetsOfEffects() -> [Set<Dream.Effect>] { // k = index of current row(dream), index = index of current effect in set
+      if n > 0 {                                            // same as a two-dimensional array
          var setEffectsArr: [Set<Dream.Effect>] = []
          for k in 0...n {
             let setSize = UserDefaults.standard.integer(forKey: "sizeOfSet\(k)")
@@ -688,7 +699,7 @@ class DreamListViewController: UITableViewController {
       return [[.fireBreathing], [.laserFocus, .magic], [.fireBreathing, .laserFocus]]
    }
 
-   func getSavedNumbersOfCreeatures() -> [Int] {
+   private func getSavedNumbersOfCreeatures() -> [Int] {
       if n > 0 {
          var numberOfCreatures: [Int] = []
          for k in 0...n {
