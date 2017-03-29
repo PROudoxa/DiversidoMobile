@@ -563,7 +563,7 @@ class DreamListViewController: UITableViewController {
    
    // for section "Dreams"
    private func getSavedModel() -> DreamListViewControllerModel {
-      if n > 0 {
+      if n > 1 {
          var dreamsArray: [Dream] = []
          for index in 0...n {
             dreamsArray.append(Dream(description: descriptionArray[index], creature: creaturesArray[index], effects: arrayOfEffectsSets[index], numberOfCreatures: numberOfCreatures[index]))
@@ -589,7 +589,7 @@ class DreamListViewController: UITableViewController {
    }
    
    private func getSavedDescriptionArray() -> [String] {
-      if n > 0 {
+      if n > 1 {
          var descrArr: [String] = []
          for k in 0...n {
             if let descr = UserDefaults.standard.string(forKey: "description\(k)") {
@@ -603,7 +603,7 @@ class DreamListViewController: UITableViewController {
    
    private func getSavedDreamCreatureArray() -> [Dream.Creature] {
       var creaturesArray: [Dream.Creature] = []
-      if n > 0 {
+      if n > 1 {
          for k in 0...n {   //k - current dream row
             if let name = UserDefaults.standard.string(forKey: "creatureName\(k)") {
                switch name {
@@ -623,7 +623,7 @@ class DreamListViewController: UITableViewController {
    }
    
    private func getSetsOfEffects() -> [Set<Dream.Effect>] { // k = index of current row(dream), index = index of current effect in the set
-      if n > 0 {                                            // same as a two-dimensional array
+      if n > 1 {                                            // same as a two-dimensional array
          var setEffectsArr: [Set<Dream.Effect>] = []
          for k in 0...n {
             let setSize = UserDefaults.standard.integer(forKey: "sizeOfSet\(k)")
@@ -655,7 +655,7 @@ class DreamListViewController: UITableViewController {
    }
 
    private func getSavedNumbersOfCreeatures() -> [Int] {
-      if n > 0 {
+      if n > -1 {
          var numberOfCreatures: [Int] = []
          for k in 0...n {
             let quantityOfDreams: Int = UserDefaults.standard.integer(forKey: "numberOfCreatures\(k)")
