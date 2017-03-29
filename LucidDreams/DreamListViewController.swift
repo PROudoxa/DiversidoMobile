@@ -127,7 +127,6 @@ class DreamListViewController: UITableViewController {
 
                 case nil: break
             }
-            saveDreamsForModel()
          }
 
         if diff.favoriteCreatureChanged {
@@ -136,7 +135,7 @@ class DreamListViewController: UITableViewController {
             tableView.reloadSections(favoriteCreatureSection, with: .automatic)
          
             //saves the last user's choice for favourite creature section
-            saveFavouriteCreatureForModel()
+            //saveFavouriteCreatureForModel()
          }
 
         // Need to register any undo changes.
@@ -543,63 +542,20 @@ class DreamListViewController: UITableViewController {
             })
         }
     }
-   
-   // MARK: Preserving model
-   
-   private func saveFavouriteCreatureForModel() {
-      DispatchQueue.global(qos: .background).async {
-         let favoriteCreature = self.model.favoriteCreature.name as NSString
-         UserDefaults.standard.set(favoriteCreature, forKey: "favoriteCreature")
-      }
-   }
-   
-   private func saveDreamsForModel() {
-     // DispatchQueue.global(qos: .background).async { //todo: fix the problem with time latency which makes troubles with saving
-         
-         UserDefaults.standard.set(self.model.dreams.count-1, forKey: "rowsQuantity")
-         
-         var k = 0  //current dream row
-         for dreamItem in self.model.dreams {
-            let des = dreamItem.description as NSString
-            let creatureName = dreamItem.creature.name as NSString
-            let numberOfCreatures = dreamItem.numberOfCreatures as NSNumber
-            
-            UserDefaults.standard.set(des, forKey: "description\(k)")
-            UserDefaults.standard.set(creatureName, forKey: "creatureName\(k)")
-            UserDefaults.standard.set(numberOfCreatures, forKey: "numberOfCreatures\(k)")
-            
-            var index = 0       // current item in the set
-            var sizeOfSet = 0   // size of current set
-            
-            let setEffects: Set<Dream.Effect> = dreamItem.effects
-            for effect in setEffects {
-               sizeOfSet = setEffects.count
-               let effectName = effect.resourceName as NSString
-               UserDefaults.standard.set(effectName, forKey: "DreamEffectsNamek=\(k)j=\(index)")
-               
-               index += 1
-            }
-            
-            UserDefaults.standard.set(sizeOfSet, forKey: "sizeOfSet\(k)")
-            
-            k+=1
-         }
-      //}
-   }
-   
+
    // MARK: INITIALIZATION using saved model. Model Restoration
    
    //for section "Favorite Creature"
    private func getSavedFavoriteCreature() -> Dream.Creature {
-      if let favoriteCreatureName = UserDefaults.standard.string(forKey: "favoriteCreature") {
+      if let favoriteCreatureName = UserDefaults.standard.string(forKey: "favoriteCreatureName") {
          switch favoriteCreatureName {
-         case "Dragon" :         return Dream.Creature.dragon
-         case "Shark" :          return Dream.Creature.shark
-         case "Crusty" :         return Dream.Creature.crusty
-         case "Pink unicorn" :   return Dream.Creature.unicorn(.pink)
-         case "White unicorn" :  return Dream.Creature.unicorn(.white)
-         case "Yellow unicorn" : return Dream.Creature.unicorn(.yellow)
-         default:                return Dream.Creature.shark
+            case "Dragon" :         return Dream.Creature.dragon
+            case "Shark" :          return Dream.Creature.shark
+            case "Crusty" :         return Dream.Creature.crusty
+            case "Pink unicorn" :   return Dream.Creature.unicorn(.pink)
+            case "White unicorn" :  return Dream.Creature.unicorn(.white)
+            case "Yellow unicorn" : return Dream.Creature.unicorn(.yellow)
+            default:                return Dream.Creature.shark
          }
       }
       return Dream.Creature.shark

@@ -7,6 +7,7 @@
                 a separate file from the `DreamListViewController` class so we can
                 test it in isolation without having to import the view controller.
 */
+import Foundation
 
 /// Defines the `Model` type for the `DreamListViewController`.
 struct DreamListViewControllerModel: Equatable {
@@ -109,12 +110,20 @@ struct DreamListViewControllerModel: Equatable {
         */
         if other.dreams.count - 1 == dreams.count {
             dreamChange = .inserted(other.dreams.last!)
+            saveUpdatedModel(newDreams: other.dreams)
+
         } else if dreams.count - 1 == other.dreams.count {
             dreamChange = .removed(dreams.last!)
+            saveUpdatedModel(newDreams: other.dreams)
+         
         } else if dreams.count == other.dreams.count {
             let updatedIndexes: [Int] = dreams.enumerated().flatMap { idx, dream in
-                if dream != other.dreams[idx] {
-                    return idx
+               
+               if dream != other.dreams[idx] {
+                  
+                   saveUpdatedDream(dreamBefore: dream, dreamAfter: other.dreams[idx], idx: idx)
+
+                   return idx
                 }
                 return nil
             }
@@ -129,10 +138,90 @@ struct DreamListViewControllerModel: Equatable {
         }
 
         let favoriteCreatureChanged = favoriteCreature != other.favoriteCreature
+      
+        if favoriteCreatureChanged {
+           saveUpdatedFavouriteCreature(newFavoriteCreature: other.favoriteCreature)
+        }
 
         return Diff(dreamChange: dreamChange, from: self, to: other, favoriteCreatureChanged: favoriteCreatureChanged)
     }
+   
+   // MARK: Preserving model
+
+   private func saveUpdatedDream(dreamBefore: Dream, dreamAfter: Dream, idx: Int) {
+     // DispatchQueue.global(qos: .background).async {
+         if dreamBefore.description != dreamAfter.description {
+            UserDefaults.standard.set(dreamAfter.description, forKey: "description\(idx)")
+         }
+         if dreamBefore.numberOfCreatures != dreamAfter.numberOfCreatures {
+            UserDefaults.standard.set(dreamAfter.numberOfCreatures, forKey: "numberOfCreatures\(idx)")
+         }
+         if dreamBefore.creature.name != dreamAfter.creature.name {
+            UserDefaults.standard.set(dreamAfter.creature.name, forKey: "creatureName\(idx)")
+         }
+         
+         if dreamBefore.effects != dreamAfter.effects {
+            var index = 0      // current element in the set
+            var sizeOfSet = 0
+            
+            let setEffects: Set<Dream.Effect> = dreamAfter.effects
+            for effect in setEffects {
+               sizeOfSet = setEffects.count
+               let effectName = effect.resourceName as NSString
+               UserDefaults.standard.set(effectName, forKey: "DreamEffectsNamek=\(idx)j=\(index)")
+               
+               index += 1
+            }
+            UserDefaults.standard.set(sizeOfSet, forKey: "sizeOfSet\(idx)")
+         }
+      //}
+   }
+   
+   private func saveUpdatedFavouriteCreature(newFavoriteCreature: Dream.Creature) {
+      let name = newFavoriteCreature.name as NSString
+      UserDefaults.standard.set(name, forKey: "favoriteCreatureName")
+   }
+   
+   private func saveUpdatedModel(newDreams: [Dream]) {
+      // DispatchQueue.global(qos: .background).async {
+      // dreams
+      UserDefaults.standard.set(newDreams.count-1, forKey: "rowsQuantity") // numbers start from 0
+      
+      var k = 0  //current dream row
+      
+      for dream in newDreams {
+         let des = dream.description as NSString
+         let creatureName = dream.creature.name as NSString
+         let numberOfCreatures = dream.numberOfCreatures as NSNumber
+         
+         UserDefaults.standard.set(des, forKey: "description\(k)")
+         UserDefaults.standard.set(creatureName, forKey: "creatureName\(k)")
+         UserDefaults.standard.set(numberOfCreatures, forKey: "numberOfCreatures\(k)")
+         
+         var index = 0       // current item in the set
+         var sizeOfSet = 0   // size of current set
+         
+         let setEffects: Set<Dream.Effect> = dream.effects
+         
+         for effect in setEffects {
+            sizeOfSet = setEffects.count
+            let effectName = effect.resourceName as NSString
+            UserDefaults.standard.set(effectName, forKey: "DreamEffectsNamek=\(k)j=\(index)")
+            
+            index += 1
+         }
+         
+         UserDefaults.standard.set(sizeOfSet, forKey: "sizeOfSet\(k)")
+         
+         k+=1
+      }
+      // favorite creature
+      //saveUpdatedFavouriteCreature(newFavoriteCreature: favoriteCreature)
+      //}
+   }
 }
+
+
 
 func ==(_ lhs: DreamListViewControllerModel, _ rhs: DreamListViewControllerModel) -> Bool {
     return lhs.favoriteCreature == rhs.favoriteCreature && lhs.dreams == rhs.dreams
