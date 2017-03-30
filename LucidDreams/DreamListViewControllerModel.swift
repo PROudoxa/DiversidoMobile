@@ -53,6 +53,13 @@ struct DreamListViewControllerModel: Equatable {
             Dream(description: "Dream 3", creature: .unicorn(.white), effects: [.fireBreathing, .laserFocus], numberOfCreatures: 3)
         ])
     }
+   
+    var necessityToSaveModel: Bool {
+       if UserDefaults.standard.bool(forKey: "flagForSavingModel") { // if "flagForSavingModel" contains "true" no need to save all model again
+          return false
+       }
+       return true
+    }
 
     /**
         A type that represents a diff between one `DreamListViewControllerModel`
@@ -121,6 +128,10 @@ struct DreamListViewControllerModel: Equatable {
                
                if dream != other.dreams[idx] {
                   
+                   if necessityToSaveModel { // enters only once(for the first launching app)
+                     saveUpdatedModel(newDreams: dreams)
+                     UserDefaults.standard.set(true, forKey: "flagForSavingModel") // switches "necessityToSaveModel" off for ever
+                   }
                    saveUpdatedDream(dreamBefore: dream, dreamAfter: other.dreams[idx], idx: idx)
 
                    return idx
@@ -218,6 +229,13 @@ struct DreamListViewControllerModel: Equatable {
       // favorite creature
       //saveUpdatedFavouriteCreature(newFavoriteCreature: favoriteCreature)
       //}
+   }
+   
+   func flagForSaving() -> Bool {
+      if !UserDefaults.standard.bool(forKey: "flagForSaving") {
+         return false
+      }
+      return true
    }
 }
 
