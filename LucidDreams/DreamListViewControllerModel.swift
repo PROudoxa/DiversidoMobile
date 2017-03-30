@@ -125,9 +125,10 @@ struct DreamListViewControllerModel: Equatable {
                   
                    if !danySavingDreams { // enters only once(first launching app in case any dream has been changed)
                      saveUpdatedModel(newDreams: dreams)
-                     danySavingDreams = true    // switches "necessityToSaveModel" off for current(first) launching
                      UserDefaults.standard.set(true, forKey: "danySavingDreams") // switches "necessityToSaveModel" off for ever
                    }
+                   danySavingDreams = true    // switches "necessityToSaveModel" off for current(first) launching
+
                    saveUpdatedDream(dreamBefore: dream, dreamAfter: other.dreams[idx], idx: idx)
 
                    return idx
