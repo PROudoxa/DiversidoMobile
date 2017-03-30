@@ -14,6 +14,8 @@ struct DreamListViewControllerModel: Equatable {
     // MARK: Properties
 
     var favoriteCreature: Dream.Creature
+   
+    private var danySavingDreams = UserDefaults.standard.bool(forKey: "danySavingDreams")
 
     private var _dreams: [Dream]
     var dreams: [Dream] { return _dreams }
@@ -54,13 +56,6 @@ struct DreamListViewControllerModel: Equatable {
         ])
     }
    
-    var necessityToSaveModel: Bool {
-       if UserDefaults.standard.bool(forKey: "flagForSavingModel") { // if "flagForSavingModel" contains "true" no need to save all model again
-          return false
-       }
-       return true
-    }
-
     /**
         A type that represents a diff between one `DreamListViewControllerModel`
         and another `DreamListViewControllerModel`.
@@ -106,7 +101,7 @@ struct DreamListViewControllerModel: Equatable {
     }
 
     /// Returns a diff of `self` and `other`.
-    func diffed(with other: DreamListViewControllerModel) -> Diff {
+    mutating func diffed(with other: DreamListViewControllerModel) -> Diff {
         let dreamChange: Diff.DreamChange?
 
         /*
@@ -128,9 +123,10 @@ struct DreamListViewControllerModel: Equatable {
                
                if dream != other.dreams[idx] {
                   
-                   if necessityToSaveModel { // enters only once(for the first launching app)
+                   if !danySavingDreams { // enters only once(first launching app in case any dream has been changed)
                      saveUpdatedModel(newDreams: dreams)
-                     UserDefaults.standard.set(true, forKey: "flagForSavingModel") // switches "necessityToSaveModel" off for ever
+                     danySavingDreams = true    // switches "necessityToSaveModel" off for current(first) launching
+                     UserDefaults.standard.set(true, forKey: "danySavingDreams") // switches "necessityToSaveModel" off for ever
                    }
                    saveUpdatedDream(dreamBefore: dream, dreamAfter: other.dreams[idx], idx: idx)
 

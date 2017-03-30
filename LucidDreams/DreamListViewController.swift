@@ -84,7 +84,7 @@ class DreamListViewController: UITableViewController {
         is described in the WWDC session).
     */
     func withValues(_ mutations: (inout Model, inout State) -> Void) {
-        let oldModel = self.model
+        var oldModel = self.model
 
         mutations(&self.model, &self.state)
 
